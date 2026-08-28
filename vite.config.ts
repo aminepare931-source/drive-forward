@@ -97,11 +97,11 @@ export default defineConfig((env): UserConfig => {
         server: { entry: "server" },
       }),
       viteReact(),
-      // Nitro for production builds (cloudflare-module default target).
+      // Nitro for production builds (Vercel target).
       ...(command === "build"
         ? [
             nitro({
-              defaultPreset: "cloudflare-module",
+              defaultPreset: "vercel",
             }),
           ]
         : []),
