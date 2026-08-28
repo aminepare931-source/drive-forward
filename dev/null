@@ -1,0 +1,164 @@
+import { jsx, jsxs } from "react/jsx-runtime";
+import { motion, useReducedMotion } from "motion/react";
+import { TrafficCone, CheckCircle2, Star } from "lucide-react";
+import { EASE, fadeIn, fadeUp, stagger } from "@/lib/motion";
+const HIGHLIGHTS = [
+  "Un espace par r\xF4le : \xE9l\xE8ve, moniteur ou \xE9tablissement",
+  "Suivi de progression th\xE9orie et conduite, en temps r\xE9el",
+  "Devoirs, examens blancs et banque de questions officielles"
+];
+function DecorativeOrbs({ reduced }) {
+  return /* @__PURE__ */ jsxs("div", { "aria-hidden": true, className: "pointer-events-none absolute inset-0 overflow-hidden", children: [
+    /* @__PURE__ */ jsx(
+      motion.div,
+      {
+        className: "absolute -left-28 -top-24 size-[26rem] rounded-full bg-indigo-400 blur-3xl",
+        initial: { opacity: 0, x: -40, y: -20 },
+        animate: reduced ? { opacity: 0.16 } : { opacity: 0.18, x: [0, 60, 0], y: [0, 50, 0], scale: [1, 1.15, 1] },
+        transition: { duration: 22, repeat: Infinity, ease: "easeInOut" }
+      }
+    ),
+    /* @__PURE__ */ jsx(
+      motion.div,
+      {
+        className: "absolute -bottom-32 -right-16 size-[28rem] rounded-full bg-amber-400/80 blur-3xl",
+        initial: { opacity: 0, x: 40, y: 30 },
+        animate: reduced ? { opacity: 0.14 } : { opacity: 0.17, x: [0, -70, 0], y: [0, -40, 0], scale: [1.1, 1, 1.1] },
+        transition: { duration: 26, repeat: Infinity, ease: "easeInOut" }
+      }
+    ),
+    /* @__PURE__ */ jsx(
+      motion.div,
+      {
+        className: "absolute left-1/3 top-2/3 size-64 rounded-full bg-indigo-500/70 blur-3xl",
+        initial: { opacity: 0 },
+        animate: reduced ? { opacity: 0.06 } : { opacity: 0.1, y: [0, -30, 0] },
+        transition: { duration: 18, repeat: Infinity, ease: "easeInOut" }
+      }
+    ),
+    /* @__PURE__ */ jsx(
+      "div",
+      {
+        className: "absolute inset-0 opacity-[0.05]",
+        style: {
+          backgroundImage: "radial-gradient(circle at 1px 1px, oklch(1 0 0 / 1) 1px, transparent 0)",
+          backgroundSize: "26px 26px"
+        }
+      }
+    )
+  ] });
+}
+function Brand({ dark }) {
+  return /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-3", children: [
+    /* @__PURE__ */ jsx(
+      motion.span,
+      {
+        initial: { scale: 0.85, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        transition: { duration: 0.5, ease: EASE },
+        className: dark ? "flex size-10 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground shadow-lg" : "flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm",
+        children: /* @__PURE__ */ jsx(TrafficCone, { className: "size-5" })
+      }
+    ),
+    /* @__PURE__ */ jsx(
+      "span",
+      {
+        className: `font-display text-lg font-bold tracking-tight ${dark ? "text-sidebar-foreground" : "text-foreground"}`,
+        children: "DriveHub"
+      }
+    )
+  ] });
+}
+function AuthShell({ children }) {
+  const reduced = useReducedMotion();
+  return /* @__PURE__ */ jsxs("main", { className: "relative min-h-screen bg-background lg:grid lg:grid-cols-[1.06fr_1fr]", children: [
+    /* @__PURE__ */ jsxs("section", { className: "relative hidden overflow-hidden bg-sidebar text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:p-12", children: [
+      /* @__PURE__ */ jsx(DecorativeOrbs, { reduced: !!reduced }),
+      /* @__PURE__ */ jsx("div", { className: "relative", children: /* @__PURE__ */ jsx(Brand, { dark: true }) }),
+      /* @__PURE__ */ jsxs("div", { className: "relative max-w-md", children: [
+        /* @__PURE__ */ jsx(
+          motion.span,
+          {
+            variants: fadeIn,
+            initial: "hidden",
+            animate: "show",
+            className: "text-xs font-semibold uppercase tracking-[0.22em] text-sidebar-primary",
+            children: "Auto-\xE9cole nouvelle g\xE9n\xE9ration"
+          }
+        ),
+        /* @__PURE__ */ jsxs(
+          motion.h1,
+          {
+            variants: fadeUp,
+            initial: "hidden",
+            animate: "show",
+            className: "mt-3 font-display text-[2.6rem] font-bold leading-[1.08] tracking-tight",
+            children: [
+              "Tout votre \xE9tablissement,",
+              /* @__PURE__ */ jsx("br", {}),
+              /* @__PURE__ */ jsx("span", { className: "text-sidebar-primary", children: "une seule plateforme." })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          motion.p,
+          {
+            variants: fadeUp,
+            initial: "hidden",
+            animate: "show",
+            className: "mt-4 text-sm leading-relaxed text-sidebar-foreground/70",
+            children: "De l'inscription au permis, suivez chaque \xE9l\xE8ve, chaque s\xE9ance et chaque paiement depuis un espace simple et clair."
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          motion.ul,
+          {
+            variants: stagger(0.35, 0.09),
+            initial: "hidden",
+            animate: "show",
+            className: "mt-9 space-y-3",
+            children: HIGHLIGHTS.map((item) => /* @__PURE__ */ jsxs(
+              motion.li,
+              {
+                variants: fadeUp,
+                className: "flex items-start gap-3 text-sm text-sidebar-foreground/80",
+                children: [
+                  /* @__PURE__ */ jsx(CheckCircle2, { className: "mt-0.5 size-4 shrink-0 text-sidebar-primary" }),
+                  /* @__PURE__ */ jsx("span", { children: item })
+                ]
+              },
+              item
+            ))
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsx("div", { className: "relative", children: /* @__PURE__ */ jsxs(
+        motion.div,
+        {
+          initial: { opacity: 0, y: 18 },
+          animate: reduced ? { opacity: 1, y: 0 } : {
+            opacity: 1,
+            y: [0, -6, 0],
+            transition: { y: { delay: 2, duration: 6, repeat: Infinity, ease: "easeInOut" } }
+          },
+          transition: { opacity: { duration: 0.6, ease: EASE } },
+          className: "flex items-center gap-4 rounded-2xl border border-sidebar-border bg-sidebar-accent/40 p-4 backdrop-blur",
+          children: [
+            /* @__PURE__ */ jsx("div", { className: "flex items-center gap-0.5", children: Array.from({ length: 5 }).map((_, i) => /* @__PURE__ */ jsx(Star, { className: "size-3.5 fill-amber-300 text-amber-300" }, i)) }),
+            /* @__PURE__ */ jsxs("div", { className: "text-xs leading-tight text-sidebar-foreground/80", children: [
+              /* @__PURE__ */ jsx("p", { className: "font-semibold text-sidebar-foreground", children: "4,8 / 5" }),
+              /* @__PURE__ */ jsx("p", { children: "2 400+ apprenants accompagn\xE9s jusqu'au permis" })
+            ] })
+          ]
+        }
+      ) })
+    ] }),
+    /* @__PURE__ */ jsx("section", { className: "flex items-center justify-center px-5 py-10 sm:px-10", children: /* @__PURE__ */ jsxs("div", { className: "w-full max-w-md", children: [
+      /* @__PURE__ */ jsx("div", { className: "mb-8 lg:hidden", children: /* @__PURE__ */ jsx(Brand, {}) }),
+      children
+    ] }) })
+  ] });
+}
+export {
+  AuthShell
+};
