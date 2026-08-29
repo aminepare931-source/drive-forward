@@ -20,9 +20,11 @@ import {
   MessageSquare,
   Phone,
   ShieldCheck,
+  Settings2,
   Sparkles,
   TrafficCone,
   UserCog,
+  UserPlus,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -396,9 +398,9 @@ function Features() {
 }
 
 const STEPS = [
-  { n: "01", t: "Créez votre compte", d: "Choisissez votre profil — élève ou directeur d'auto-école — et renseignez vos informations." },
-  { n: "02", t: "Configurez votre espace", d: "Les directeurs créent leur établissement ; les élèves rejoignent leur auto-école." },
-  { n: "03", t: "Pilotez au quotidien", d: "Suivez la formation, le planning, les paiements et les documents en temps réel." },
+  { n: "01", icon: UserPlus, t: "Créez votre compte", d: "Choisissez votre profil — élève ou directeur d'auto-école — et renseignez vos informations." },
+  { n: "02", icon: Settings2, t: "Configurez votre espace", d: "Les directeurs créent leur établissement ; les élèves rejoignent leur auto-école." },
+  { n: "03", icon: LayoutDashboard, t: "Pilotez au quotidien", d: "Suivez la formation, le planning, les paiements et les documents en temps réel." },
 ];
 
 function Steps() {
@@ -411,27 +413,37 @@ function Steps() {
             Lancez-vous en quelques minutes
           </h2>
         </div>
-        <div className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-6">
-          <div
-            aria-hidden
-            className="absolute left-0 right-0 top-6 hidden h-px bg-border md:block"
-          />
-          {STEPS.map((s, i) => (
-            <motion.div
-              key={s.n}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: i * 0.12, ease: EASE }}
-              className="relative text-center md:text-left"
-            >
-              <span className="relative z-10 mx-auto flex size-12 items-center justify-center rounded-full bg-primary font-display text-sm font-bold text-primary-foreground md:mx-0">
-                {s.n}
-              </span>
-              <h3 className="mt-4 font-display text-lg font-semibold">{s.t}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
-            </motion.div>
-          ))}
+
+        <motion.div
+          initial={{ opacity: 0, y: 28 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, ease: EASE }}
+          className="relative mt-12 overflow-hidden rounded-3xl border border-border/60 bg-card shadow-xl shadow-primary/5 sm:mt-14"
+        >
+          <div className="grid divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+            {STEPS.map((s) => (
+              <div key={s.n} className="relative p-7 sm:p-8">
+                <span className="absolute right-6 top-6 font-display text-3xl font-bold text-primary/10 sm:text-4xl">
+                  {s.n}
+                </span>
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <s.icon className="size-5" />
+                </span>
+                <h3 className="mt-5 font-display text-lg font-semibold">{s.t}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        <div className="mt-8 flex justify-center">
+          <a
+            href="#fonctionnalites"
+            className={cn(buttonVariants({ variant: "outline" }), "rounded-full px-6")}
+          >
+            Découvrir toutes les fonctionnalités <ArrowRight className="size-4" />
+          </a>
         </div>
       </div>
     </section>
