@@ -317,35 +317,64 @@ const FEATURES: Feature[] = [
 
 function Features() {
   return (
-    <section id="fonctionnalites" className="scroll-mt-20 bg-muted/30 py-20 sm:py-24">
-      <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="flex flex-wrap items-end justify-between gap-6">
+    <section id="fonctionnalites" className="scroll-mt-20">
+      <div className="relative overflow-hidden bg-primary pb-28 pt-16 text-primary-foreground sm:pb-32 sm:pt-20">
+        <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08]">
+          <div className="absolute -left-16 top-0 size-72 rounded-full bg-white blur-3xl" />
+          <div className="absolute -right-10 bottom-0 size-80 rounded-full bg-white blur-3xl" />
+        </div>
+        <div className="relative mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-6 px-5 sm:px-8">
           <div>
-            <SectionKicker label="Fonctionnalités" />
+            <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/70">
+              <span className="h-px w-6 bg-primary-foreground/60" /> Fonctionnalités
+            </span>
             <h2 className="mt-3 max-w-md font-display text-3xl font-bold tracking-tight sm:text-4xl">
               Nos modules de gestion
             </h2>
           </div>
-          <p className="max-w-sm text-sm text-muted-foreground">
-            18 modules couvrant la formation, les opérations et l'administration — accessibles
-            selon votre rôle dans l'établissement.
-          </p>
+          <div className="flex items-center gap-3 text-primary-foreground/85">
+            <span className="flex size-10 items-center justify-center rounded-full bg-white/15">
+              <Phone className="size-4" />
+            </span>
+            <div className="text-sm">
+              <p className="text-xs text-primary-foreground/60">Une question ?</p>
+              <p className="font-semibold">01 00 00 00 00</p>
+            </div>
+          </div>
         </div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
+        {/* Wave divider */}
+        <svg
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-20 w-full text-background sm:h-28"
+          viewBox="0 0 1440 120"
+          preserveAspectRatio="none"
+        >
+          <path
+            fill="currentColor"
+            d="M0,64 C240,120 480,0 720,32 C960,64 1200,128 1440,64 L1440,120 L0,120 Z"
+          />
+        </svg>
+      </div>
+
+      <div className="relative mx-auto -mt-20 max-w-6xl px-5 sm:-mt-24 sm:px-8">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.slice(0, 8).map((f, i) => (
             <motion.div
               key={f.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.5, delay: (i % 4) * 0.08, ease: EASE }}
             >
-              <Card className="h-full rounded-2xl border-border/60 transition-all hover:-translate-y-1 hover:shadow-lg">
-                <CardContent className="p-6">
-                  <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Card className="h-full overflow-hidden rounded-2xl border-border/60 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl">
+                <div className="flex h-24 items-center justify-center bg-primary/10">
+                  <span className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <f.icon className="size-5" />
                   </span>
-                  <h3 className="mt-4 font-display text-base font-semibold">{f.title}</h3>
+                </div>
+                <CardContent className="p-5">
+                  <h3 className="font-display text-base font-semibold">{f.title}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                   <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-primary">
                     Découvrir <ArrowUpRight className="size-3.5" />
@@ -355,7 +384,13 @@ function Features() {
             </motion.div>
           ))}
         </div>
+        <p className="mt-8 text-center text-sm text-muted-foreground">
+          18 modules couvrant la formation, les opérations et l'administration — accessibles
+          selon votre rôle dans l'établissement.
+        </p>
       </div>
+
+      <div className="h-20 sm:h-24" />
     </section>
   );
 }
