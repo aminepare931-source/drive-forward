@@ -1,13 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import {
-  motion,
-  useInView,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
-  type Variants,
-} from "framer-motion";
+import { motion, useInView, useScroll, useSpring, type Variants } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
@@ -15,7 +7,6 @@ import {
   BookOpen,
   CalendarDays,
   Car,
-  Check,
   CheckCircle2,
   ClipboardList,
   Clock,
@@ -36,7 +27,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Accordion,
@@ -63,17 +53,19 @@ export const Route = createFileRoute("/")({
   component: LandingPage,
 });
 
-/* ---------- Motion helpers ---------- */
+/* ---------- Shared motion primitives ---------- */
 
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 22 },
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
-const staggerContainer: Variants = {
+const stagger: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
 };
+
+const viewportOnce = { once: true, margin: "-60px" } as const;
 
 function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -103,37 +95,34 @@ function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: strin
   );
 }
 
-function MotionButton({
+function MotionLink({
   to,
   href,
-  children,
   className,
+  children,
 }: {
   to?: string;
   href?: string;
-  children: React.ReactNode;
   className?: string;
+  children: React.ReactNode;
 }) {
-  const inner = (
+  const content = (
     <motion.span
-      whileHover={{ scale: 1.035 }}
-      whileTap={{ scale: 0.96 }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
       className={cn("inline-flex items-center", className)}
     >
       {children}
     </motion.span>
   );
-  if (to) {
-    return (
-      <Link to={to} className="inline-block">
-        {inner}
-      </Link>
-    );
-  }
-  return (
+  return to ? (
+    <Link to={to} className="inline-block">
+      {content}
+    </Link>
+  ) : (
     <a href={href} className="inline-block">
-      {inner}
+      {content}
     </a>
   );
 }
@@ -143,16 +132,14 @@ function MotionButton({
 function Brand({ onDark = false }: { onDark?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2.5">
-      <motion.span
-        whileHover={{ rotate: -8, scale: 1.05 }}
-        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+      <span
         className={cn(
           "flex size-9 items-center justify-center rounded-xl",
           onDark ? "bg-white text-primary" : "bg-primary text-primary-foreground",
         )}
       >
         <TrafficCone className="size-5" />
-      </motion.span>
+      </span>
       <span
         className={cn(
           "font-display text-lg font-semibold tracking-tight",
@@ -174,16 +161,13 @@ const NAV_LINKS = [
 
 function Header() {
   const { scrollY, scrollYProgress } = useScroll();
-  const [scrolled, setScrolled] = useState(false);
   const progress = useSpring(scrollYProgress, { stiffness: 200, damping: 30, restDelta: 0.001 });
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => scrollY.on("change", (v) => setScrolled(v > 12)), [scrollY]);
   const [hovered, setHovered] = useState<string | null>(null);
 
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE }}
+    <header
       className={cn(
         "sticky top-0 z-40 bg-sidebar text-sidebar-foreground transition-shadow",
         scrolled && "shadow-lg shadow-black/10",
@@ -224,17 +208,14 @@ function Header() {
             href="tel:+33100000000"
             className="hidden items-center gap-2 text-sm text-sidebar-foreground/80 lg:flex"
           >
-            <span className="flex size-8 items-center justify-center rounded-full bg-sidebar-foreground/10">
-              <Phone className="size-3.5" />
-            </span>
-            01 00 00 00 00
+            <Phone className="size-3.5" /> 01 00 00 00 00
           </a>
-          <MotionButton to="/inscription" className={cn(buttonVariants({ size: "sm" }), "rounded-full px-4")}>
+          <MotionLink to="/inscription" className={cn(buttonVariants({ size: "sm" }), "rounded-full px-4")}>
             Essai gratuit
-          </MotionButton>
+          </MotionLink>
         </div>
       </div>
-    </motion.header>
+    </header>
   );
 }
 
@@ -242,7 +223,7 @@ function Hero() {
   return (
     <section className="relative overflow-hidden bg-sidebar text-sidebar-foreground">
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-bl from-primary/30 via-transparent to-transparent" />
+        <div className="absolute inset-y-0 right-0 w-1/2 bg-gradient-to-bl from-primary/25 via-transparent to-transparent" />
         <motion.div
           className="absolute -right-20 top-10 size-96 rounded-full bg-primary/40 blur-[110px]"
           animate={{ opacity: [0.5, 0.75, 0.5], scale: [1, 1.08, 1] }}
@@ -251,11 +232,7 @@ function Hero() {
       </div>
 
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 pb-16 pt-14 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:pb-24 lg:pt-16">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="show"
-        >
+        <motion.div variants={stagger} initial="hidden" animate="show">
           <motion.span
             variants={fadeUp}
             className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-sidebar-foreground/85"
@@ -264,11 +241,11 @@ function Hero() {
           </motion.span>
           <motion.h1
             variants={fadeUp}
-            className="mt-6 font-display text-4xl font-bold uppercase leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]"
+            className="mt-6 font-display text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.25rem]"
           >
-            Conduite sereine,
+            Toute votre auto-école,
             <br />
-            réussite <span className="text-primary">assurée.</span>
+            <span className="text-primary">une seule plateforme.</span>
           </motion.h1>
           <motion.p
             variants={fadeUp}
@@ -278,10 +255,10 @@ function Hero() {
             espace. Une gestion simple pour l'école, un suivi clair pour l'élève.
           </motion.p>
           <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-3">
-            <MotionButton to="/inscription" className={cn(buttonVariants({ size: "lg" }), "rounded-full px-6")}>
+            <MotionLink to="/inscription" className={cn(buttonVariants({ size: "lg" }), "rounded-full px-6")}>
               Créer mon compte <ArrowRight className="size-4" />
-            </MotionButton>
-            <MotionButton
+            </MotionLink>
+            <MotionLink
               to="/connexion"
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
@@ -289,7 +266,7 @@ function Hero() {
               )}
             >
               Se connecter
-            </MotionButton>
+            </MotionLink>
           </motion.div>
         </motion.div>
 
@@ -302,7 +279,7 @@ function Hero() {
           <motion.div
             animate={{ y: [0, -14, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 rounded-[3rem] bg-gradient-to-br from-primary/90 to-primary/50 shadow-2xl shadow-primary/30"
+            className="absolute inset-0 rounded-[3rem] bg-gradient-to-br from-primary/90 to-primary/50"
           >
             <div className="flex size-full items-center justify-center">
               <motion.div
@@ -317,27 +294,21 @@ function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4, ease: EASE }}
-            whileHover={{ y: -4 }}
-            className="absolute -bottom-6 -left-6 w-56 rounded-2xl bg-card p-4 text-foreground shadow-xl"
+            className="absolute -bottom-6 -left-6 flex items-center gap-2 rounded-2xl bg-card px-4 py-3 text-foreground"
           >
-            <div className="flex items-center gap-2">
-              <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <ShieldCheck className="size-4" />
-              </span>
-              <div>
-                <p className="font-display text-sm font-semibold leading-none">
-                  <AnimatedCounter value={700} suffix="+" />
-                </p>
-                <p className="mt-1 text-[11px] text-muted-foreground">élèves accompagnés</p>
-              </div>
-            </div>
+            <ShieldCheck className="size-4 text-primary" />
+            <p className="text-xs font-medium">
+              <span className="font-display font-semibold">
+                <AnimatedCounter value={700} suffix="+" />
+              </span>{" "}
+              élèves accompagnés
+            </p>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.55, ease: EASE }}
-            whileHover={{ y: 4 }}
-            className="absolute -right-4 -top-4 flex items-center gap-1.5 rounded-full bg-card px-3.5 py-2 text-foreground shadow-xl"
+            className="absolute -right-4 -top-4 flex items-center gap-1.5 rounded-full bg-card px-3.5 py-2 text-foreground"
           >
             <motion.span
               animate={{ opacity: [1, 0.3, 1] }}
@@ -361,84 +332,87 @@ function SectionKicker({ label }: { label: string }) {
   );
 }
 
-function TrustSection() {
+/* ---------- Trust strip ---------- */
+
+const TRUST_ITEMS = [
+  { icon: HeadphonesIcon, text: "Support disponible 24/7" },
+  { icon: Clock, text: "Planning flexible" },
+  { icon: CheckCircle2, text: "Suivi en temps réel" },
+  { icon: ShieldCheck, text: "Conforme à la réglementation" },
+];
+
+function TrustStrip() {
+  return (
+    <section className="border-y border-border bg-muted/25 py-8">
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-5 sm:grid-cols-4 sm:px-8"
+      >
+        {TRUST_ITEMS.map((t) => (
+          <motion.div key={t.text} variants={fadeUp} className="flex items-center gap-2.5 text-muted-foreground">
+            <t.icon className="size-4 shrink-0 text-primary" />
+            <span className="text-sm">{t.text}</span>
+          </motion.div>
+        ))}
+      </motion.div>
+    </section>
+  );
+}
+
+/* ---------- About / pour qui ---------- */
+
+function About() {
   const points = [
-    { icon: HeadphonesIcon, text: "Support disponible 24/7 pour élèves et moniteurs" },
-    { icon: Clock, text: "Planning flexible, modifiable en quelques clics" },
-    { icon: CheckCircle2, text: "Suivi de progression en temps réel jusqu'au permis" },
+    "Formation théorique et pratique suivies de bout en bout",
+    "Planning et réservation des véhicules centralisés",
+    "Paiements et documents administratifs au même endroit",
   ];
   return (
-    <section className="py-20 sm:py-24">
-      <div className="mx-auto grid max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: EASE }}
-          className="relative mx-auto aspect-square w-full max-w-xs"
-        >
-          <motion.div
-            animate={{ rotate: [0, 3, 0, -3, 0] }}
-            transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-muted to-muted/40"
-          />
-          <div className="absolute inset-6 flex items-center justify-center rounded-[2rem] bg-primary/10">
-            <UserCog className="size-24 text-primary" strokeWidth={1.1} />
-          </div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.6 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.4, ease: EASE }}
-            className="absolute -bottom-4 -right-4 flex size-16 items-center justify-center rounded-full bg-card text-center shadow-lg"
-          >
-            <span className="font-display text-xs font-bold leading-tight text-primary">
-              Depuis
-              <br />
-              2020
-            </span>
+    <section id="pour-qui" className="scroll-mt-20 py-20 sm:py-24">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={viewportOnce}>
+            <motion.div variants={fadeUp}>
+              <SectionKicker label="À propos" />
+            </motion.div>
+            <motion.h2
+              variants={fadeUp}
+              className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl"
+            >
+              Le partenaire de confiance de votre auto-école
+            </motion.h2>
+            <motion.p variants={fadeUp} className="mt-4 max-w-md text-muted-foreground">
+              DriveHub rend la gestion d'une auto-école simple et fluide, du premier cours
+              jusqu'au passage de l'examen — pour la direction comme pour les élèves.
+            </motion.p>
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: "-80px" }}
-        >
-          <motion.div variants={fadeUp}>
-            <SectionKicker label="À propos" />
-          </motion.div>
-          <motion.h2
-            variants={fadeUp}
-            className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl"
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="divide-y divide-border border-t border-border"
           >
-            DriveHub, le partenaire de confiance de votre auto-école
-          </motion.h2>
-          <motion.p variants={fadeUp} className="mt-4 text-muted-foreground">
-            Que ce soit pour la formation, l'administration ou la relation avec vos élèves, notre
-            équipe conçoit DriveHub pour rendre la gestion d'une auto-école simple et fluide, du
-            premier cours jusqu'au passage de l'examen.
-          </motion.p>
-          <motion.ul variants={staggerContainer} className="mt-6 space-y-3">
-            {points.map((p) => (
-              <motion.li
-                key={p.text}
-                variants={fadeUp}
-                className="flex items-center gap-3 text-sm font-medium"
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-success/10 text-success">
-                  <p.icon className="size-4" />
+            {points.map((p, i) => (
+              <motion.div key={p} variants={fadeUp} className="flex items-start gap-5 py-5">
+                <span className="font-display text-sm font-semibold text-primary">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
-                {p.text}
-              </motion.li>
+                <p className="text-sm text-foreground/90 sm:text-base">{p}</p>
+              </motion.div>
             ))}
-          </motion.ul>
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
 }
+
+/* ---------- Features ---------- */
 
 interface Feature {
   icon: LucideIcon;
@@ -462,109 +436,69 @@ const FEATURES: Feature[] = [
   { icon: ShieldCheck, title: "Multi-écoles", desc: "Pilotez plusieurs établissements depuis un même espace sécurisé.", roles: "Groupes d'écoles" },
 ];
 
-function FeatureCard({ f }: { f: Feature }) {
+function FeatureRow({ f }: { f: Feature }) {
   return (
-    <motion.div variants={fadeUp} whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 300, damping: 22 }}>
-      <Card className="h-full overflow-hidden rounded-2xl border-border/60 shadow-lg transition-shadow hover:shadow-xl">
-        <div className="flex h-24 items-center justify-center bg-primary/10">
-          <motion.span
-            whileHover={{ rotate: 12, scale: 1.1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 15 }}
-            className="flex size-12 items-center justify-center rounded-full bg-primary text-primary-foreground"
-          >
-            <f.icon className="size-5" />
-          </motion.span>
-        </div>
-        <CardContent className="p-5">
-          <h3 className="font-display text-base font-semibold">{f.title}</h3>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
-          <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-primary">
-            Découvrir <ArrowUpRight className="size-3.5" />
-          </span>
-        </CardContent>
-      </Card>
+    <motion.div
+      variants={fadeUp}
+      whileHover={{ x: 4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 24 }}
+      className="group border-t border-border py-6"
+    >
+      <motion.span
+        whileHover={{ rotate: 8, scale: 1.08 }}
+        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+        className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+      >
+        <f.icon className="size-4.5" />
+      </motion.span>
+      <h3 className="mt-4 font-display text-base font-semibold">{f.title}</h3>
+      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+      <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
+        Découvrir <ArrowUpRight className="size-3.5" />
+      </span>
     </motion.div>
   );
 }
 
 function Features() {
   return (
-    <section id="fonctionnalites" className="scroll-mt-20">
-      <div className="relative overflow-hidden bg-primary pb-28 pt-16 text-primary-foreground sm:pb-32 sm:pt-20">
-        <div aria-hidden className="pointer-events-none absolute inset-0 opacity-[0.08]">
-          <motion.div
-            animate={{ x: [0, 20, 0], y: [0, 10, 0] }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -left-16 top-0 size-72 rounded-full bg-white blur-3xl"
-          />
-          <motion.div
-            animate={{ x: [0, -20, 0], y: [0, -10, 0] }}
-            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -right-10 bottom-0 size-80 rounded-full bg-white blur-3xl"
-          />
-        </div>
-        <div className="relative mx-auto flex max-w-6xl flex-wrap items-end justify-between gap-6 px-5 sm:px-8">
-          <motion.div {...({ initial: "hidden", whileInView: "show", viewport: { once: true } } as const)} variants={staggerContainer}>
-            <motion.span
-              variants={fadeUp}
-              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground/70"
-            >
-              <span className="h-px w-6 bg-primary-foreground/60" /> Fonctionnalités
-            </motion.span>
+    <section id="fonctionnalites" className="scroll-mt-20 bg-muted/25 py-20 sm:py-24">
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <motion.div variants={stagger} initial="hidden" whileInView="show" viewport={viewportOnce}>
+            <motion.div variants={fadeUp}>
+              <SectionKicker label="Fonctionnalités" />
+            </motion.div>
             <motion.h2
               variants={fadeUp}
-              className="mt-3 max-w-md font-display text-3xl font-bold tracking-tight sm:text-4xl"
+              className="mt-3 max-w-md font-display text-3xl font-semibold tracking-tight sm:text-4xl"
             >
               Nos modules de gestion
             </motion.h2>
           </motion.div>
-          <div className="flex items-center gap-3 text-primary-foreground/85">
-            <span className="flex size-10 items-center justify-center rounded-full bg-white/15">
-              <Phone className="size-4" />
-            </span>
-            <div className="text-sm">
-              <p className="text-xs text-primary-foreground/60">Une question ?</p>
-              <p className="font-semibold">01 00 00 00 00</p>
-            </div>
-          </div>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            18 modules couvrant la formation, les opérations et l'administration — accessibles
+            selon votre rôle dans l'établissement.
+          </p>
         </div>
 
-        {/* Wave divider */}
-        <svg
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-20 w-full text-background sm:h-28"
-          viewBox="0 0 1440 120"
-          preserveAspectRatio="none"
-        >
-          <path
-            fill="currentColor"
-            d="M0,64 C240,120 480,0 720,32 C960,64 1200,128 1440,64 L1440,120 L0,120 Z"
-          />
-        </svg>
-      </div>
-
-      <div className="relative mx-auto -mt-20 max-w-6xl px-5 sm:-mt-24 sm:px-8">
         <motion.div
-          variants={staggerContainer}
+          variants={stagger}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          viewport={viewportOnce}
+          className="mt-4 grid gap-x-8 sm:grid-cols-2 lg:grid-cols-4"
         >
           {FEATURES.slice(0, 8).map((f) => (
-            <FeatureCard key={f.title} f={f} />
+            <FeatureRow key={f.title} f={f} />
           ))}
         </motion.div>
-        <p className="mt-8 text-center text-sm text-muted-foreground">
-          18 modules couvrant la formation, les opérations et l'administration — accessibles
-          selon votre rôle dans l'établissement.
-        </p>
       </div>
-
-      <div className="h-20 sm:h-24" />
     </section>
   );
 }
+
+/* ---------- Steps ---------- */
 
 const STEPS = [
   { n: "01", icon: UserPlus, t: "Créez votre compte", d: "Choisissez votre profil — élève ou directeur d'auto-école — et renseignez vos informations." },
@@ -576,54 +510,43 @@ function Steps() {
   return (
     <section id="etapes" className="scroll-mt-20 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="mx-auto max-w-xl text-center">
+        <div className="max-w-xl">
           <SectionKicker label="Comment ça marche" />
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             Lancez-vous en quelques minutes
           </h2>
         </div>
 
         <motion.div
-          variants={staggerContainer}
+          variants={stagger}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          className="relative mt-12 overflow-hidden rounded-3xl border border-border/60 bg-card shadow-xl shadow-primary/5 sm:mt-14"
+          viewport={viewportOnce}
+          className="mt-12 grid divide-y divide-border border-t border-border sm:grid-cols-3 sm:divide-x sm:divide-y-0"
         >
-          <div className="grid divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            {STEPS.map((s) => (
-              <motion.div
-                key={s.n}
-                variants={fadeUp}
-                whileHover={{ backgroundColor: "rgba(0,0,0,0.015)" }}
-                className="relative p-7 sm:p-8"
+          {STEPS.map((s) => (
+            <motion.div key={s.n} variants={fadeUp} className="relative py-8 sm:px-8 sm:first:pl-0">
+              <span className="absolute right-0 top-8 font-display text-4xl font-semibold text-primary/10 sm:right-8">
+                {s.n}
+              </span>
+              <motion.span
+                whileHover={{ scale: 1.1, rotate: -6 }}
+                transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary"
               >
-                <span className="absolute right-6 top-6 font-display text-3xl font-bold text-primary/10 sm:text-4xl">
-                  {s.n}
-                </span>
-                <motion.span
-                  whileHover={{ scale: 1.1, rotate: -6 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
-                  className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"
-                >
-                  <s.icon className="size-5" />
-                </motion.span>
-                <h3 className="mt-5 font-display text-lg font-semibold">{s.t}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
-              </motion.div>
-            ))}
-          </div>
+                <s.icon className="size-5" />
+              </motion.span>
+              <h3 className="mt-5 font-display text-lg font-semibold">{s.t}</h3>
+              <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+            </motion.div>
+          ))}
         </motion.div>
-
-        <div className="mt-8 flex justify-center">
-          <MotionButton href="#fonctionnalites" className={cn(buttonVariants({ variant: "outline" }), "rounded-full px-6")}>
-            Découvrir toutes les fonctionnalités <ArrowRight className="size-4" />
-          </MotionButton>
-        </div>
       </div>
     </section>
   );
 }
+
+/* ---------- Testimonials ---------- */
 
 const TESTIMONIALS = [
   { name: "Léa M.", role: "Élève, permis B", quote: "J'ai suivi toute ma progression et réservé mes créneaux sans jamais appeler l'école." },
@@ -633,39 +556,34 @@ const TESTIMONIALS = [
 
 function Testimonials() {
   return (
-    <section className="bg-muted/30 py-20 sm:py-24">
+    <section className="bg-muted/25 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="mx-auto max-w-xl text-center">
-          <SectionKicker label="Témoignages" />
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            Ce qu'en disent nos utilisateurs
-          </h2>
-        </div>
+        <SectionKicker label="Témoignages" />
+        <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+          Ce qu'en disent nos utilisateurs
+        </h2>
+
         <motion.div
-          variants={staggerContainer}
+          variants={stagger}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
-          className="mt-12 grid gap-5 md:grid-cols-3"
+          viewport={viewportOnce}
+          className="mt-10 grid divide-y divide-border border-t border-border sm:grid-cols-3 sm:divide-x sm:divide-y-0"
         >
           {TESTIMONIALS.map((t) => (
-            <motion.div key={t.name} variants={fadeUp} whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 300, damping: 22 }}>
-              <Card className="h-full rounded-2xl border-border/60 transition-shadow hover:shadow-lg">
-                <CardContent className="p-6">
-                  <p className="text-sm leading-relaxed text-foreground/90">"{t.quote}"</p>
-                  <div className="mt-5 flex items-center gap-3">
-                    <Avatar className="size-9">
-                      <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
-                        {t.name.split(" ").map((n) => n[0]).join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm font-semibold leading-none">{t.name}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">{t.role}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <motion.div key={t.name} variants={fadeUp} className="py-7 sm:px-8 sm:first:pl-0">
+              <p className="text-sm leading-relaxed text-foreground/90">"{t.quote}"</p>
+              <div className="mt-5 flex items-center gap-3">
+                <Avatar className="size-9">
+                  <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+                    {t.name.split(" ").map((n) => n[0]).join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-semibold leading-none">{t.name}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t.role}</p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </motion.div>
@@ -673,6 +591,8 @@ function Testimonials() {
     </section>
   );
 }
+
+/* ---------- FAQ ---------- */
 
 const FAQS = [
   { q: "Comment mon auto-école rejoint-elle DriveHub ?", a: "Le directeur crée un compte, configure son établissement (véhicules, moniteurs, offres) puis invite ses élèves et moniteurs à rejoindre l'espace." },
@@ -687,15 +607,15 @@ function Faq() {
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <div className="text-center">
           <SectionKicker label="Questions fréquentes" />
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
             Vos questions, nos réponses
           </h2>
         </div>
         <motion.div
-          variants={staggerContainer}
+          variants={stagger}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-60px" }}
+          viewport={viewportOnce}
           className="mt-10"
         >
           <Accordion type="single" collapsible className="w-full">
@@ -716,13 +636,15 @@ function Faq() {
   );
 }
 
+/* ---------- CTA + Footer ---------- */
+
 function CtaBand() {
   return (
     <section className="bg-sidebar py-20 text-sidebar-foreground sm:py-24">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
+        viewport={viewportOnce}
         transition={{ duration: 0.7, ease: EASE }}
         className="relative mx-auto max-w-4xl overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary to-primary/70 px-6 py-14 text-center text-primary-foreground sm:px-12 sm:py-16"
       >
@@ -732,7 +654,7 @@ function CtaBand() {
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="pointer-events-none absolute -right-10 -top-10 size-56 rounded-full bg-white blur-3xl"
         />
-        <h2 className="relative font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <h2 className="relative font-display text-3xl font-semibold tracking-tight sm:text-4xl">
           Prêt à piloter votre auto-école avec DriveHub ?
         </h2>
         <p className="relative mx-auto mt-4 max-w-xl text-sm text-primary-foreground/85 sm:text-base">
@@ -740,13 +662,13 @@ function CtaBand() {
           les élèves rejoignent leur école.
         </p>
         <div className="relative mt-8 flex flex-wrap items-center justify-center gap-3">
-          <MotionButton
+          <MotionLink
             to="/inscription"
             className={cn(buttonVariants({ size: "lg" }), "rounded-full bg-white px-6 text-primary hover:bg-white/90")}
           >
             Créer mon compte <ArrowRight className="size-4" />
-          </MotionButton>
-          <MotionButton
+          </MotionLink>
+          <MotionLink
             to="/connexion"
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
@@ -754,7 +676,7 @@ function CtaBand() {
             )}
           >
             J'ai déjà un compte
-          </MotionButton>
+          </MotionLink>
         </div>
       </motion.div>
     </section>
@@ -773,9 +695,7 @@ function Footer() {
           </p>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/50">
-            Produit
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/50">Produit</p>
           <ul className="mt-4 space-y-2.5 text-sm text-sidebar-foreground/70">
             <li><a href="#fonctionnalites" className="hover:text-white">Fonctionnalités</a></li>
             <li><a href="#pour-qui" className="hover:text-white">Pour qui</a></li>
@@ -783,21 +703,15 @@ function Footer() {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/50">
-            Compte
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/50">Compte</p>
           <ul className="mt-4 space-y-2.5 text-sm text-sidebar-foreground/70">
             <li><Link to="/connexion" className="hover:text-white">Connexion</Link></li>
             <li><Link to="/inscription" className="hover:text-white">Inscription</Link></li>
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/50">
-            Restons en contact
-          </p>
-          <p className="mt-4 text-sm text-sidebar-foreground/60">
-            Recevez nos actualités et nouveautés.
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/50">Restons en contact</p>
+          <p className="mt-4 text-sm text-sidebar-foreground/60">Recevez nos actualités et nouveautés.</p>
           <form className="mt-3 flex items-center gap-2" onSubmit={(e) => e.preventDefault()}>
             <input
               type="email"
@@ -806,8 +720,8 @@ function Footer() {
             />
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.035 }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
               className={cn(buttonVariants({ size: "sm" }), "shrink-0 rounded-full px-4")}
             >
@@ -830,7 +744,8 @@ function LandingPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <Hero />
-      <TrustSection />
+      <TrustStrip />
+      <About />
       <Features />
       <Steps />
       <Testimonials />
