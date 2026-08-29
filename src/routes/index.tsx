@@ -419,16 +419,59 @@ interface Feature {
   title: string;
   desc: string;
   roles: string;
+  photo?: string;
 }
 
 const FEATURES: Feature[] = [
-  { icon: LayoutDashboard, title: "Pilotage", desc: "Tableau de bord et suivi d'activité pour diriger votre établissement.", roles: "Direction" },
-  { icon: Users, title: "Élèves", desc: "Fiches de suivi, progression et historique complet par apprenant.", roles: "Tous les rôles" },
-  { icon: UserCog, title: "Moniteurs", desc: "Équipe, spécialités, planning et charge de travail des moniteurs.", roles: "Direction & secrétariat" },
-  { icon: BookOpen, title: "Cours & théorie", desc: "Contenus de formation, groupes et suivi de la progression théorique.", roles: "Direction & moniteurs" },
-  { icon: ClipboardList, title: "Devoirs", desc: "Exercices, banque de questions et remises corrigées.", roles: "Direction, moniteurs & élèves" },
-  { icon: GraduationCap, title: "Examens", desc: "Examens blancs et suivi des résultats jusqu'au passage du permis.", roles: "Direction, moniteurs & élèves" },
-  { icon: CalendarDays, title: "Planning", desc: "Séances, créneaux et réservation des véhicules en un coup d'œil.", roles: "Tous les rôles" },
+  {
+    icon: LayoutDashboard,
+    title: "Pilotage",
+    desc: "Tableau de bord et suivi d'activité pour diriger votre établissement.",
+    roles: "Direction",
+    photo: "https://images.pexels.com/photos/30688593/pexels-photo-30688593.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    icon: Users,
+    title: "Élèves",
+    desc: "Fiches de suivi, progression et historique complet par apprenant.",
+    roles: "Tous les rôles",
+    photo: "https://images.pexels.com/photos/34162714/pexels-photo-34162714.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    icon: UserCog,
+    title: "Moniteurs",
+    desc: "Équipe, spécialités, planning et charge de travail des moniteurs.",
+    roles: "Direction & secrétariat",
+    photo: "https://images.pexels.com/photos/30690402/pexels-photo-30690402.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    icon: BookOpen,
+    title: "Cours & théorie",
+    desc: "Contenus de formation, groupes et suivi de la progression théorique.",
+    roles: "Direction & moniteurs",
+    photo: "https://images.pexels.com/photos/28593054/pexels-photo-28593054.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    icon: ClipboardList,
+    title: "Devoirs",
+    desc: "Exercices, banque de questions et remises corrigées.",
+    roles: "Direction, moniteurs & élèves",
+    photo: "https://images.pexels.com/photos/3869652/pexels-photo-3869652.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    icon: GraduationCap,
+    title: "Examens",
+    desc: "Examens blancs et suivi des résultats jusqu'au passage du permis.",
+    roles: "Direction, moniteurs & élèves",
+    photo: "https://images.pexels.com/photos/3894376/pexels-photo-3894376.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    icon: CalendarDays,
+    title: "Planning",
+    desc: "Séances, créneaux et réservation des véhicules en un coup d'œil.",
+    roles: "Tous les rôles",
+    photo: "https://images.pexels.com/photos/3869641/pexels-photo-3869641.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
   { icon: Car, title: "Véhicules", desc: "Parc, entretien, révisions et disponibilité de chaque voiture.", roles: "Direction & secrétariat" },
   { icon: CreditCard, title: "Paiements", desc: "Suivi des règlements, échéances et historique par élève.", roles: "Direction, secrétariat & élèves" },
   { icon: FileText, title: "Documents", desc: "Contrats, certificats et pièces administratives centralisés.", roles: "Direction, secrétariat & élèves" },
@@ -444,13 +487,27 @@ function FeatureRow({ f }: { f: Feature }) {
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className="group border-t border-border py-6"
     >
-      <motion.span
-        whileHover={{ rotate: 8, scale: 1.08 }}
-        transition={{ type: "spring", stiffness: 300, damping: 15 }}
-        className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
-      >
-        <f.icon className="size-4.5" />
-      </motion.span>
+      {f.photo ? (
+        <div className="relative h-32 w-full overflow-hidden rounded-xl">
+          <img
+            src={f.photo}
+            alt=""
+            loading="lazy"
+            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <span className="absolute bottom-2 left-2 flex size-8 items-center justify-center rounded-full bg-white/90 text-primary backdrop-blur">
+            <f.icon className="size-4" />
+          </span>
+        </div>
+      ) : (
+        <motion.span
+          whileHover={{ rotate: 8, scale: 1.08 }}
+          transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary"
+        >
+          <f.icon className="size-4.5" />
+        </motion.span>
+      )}
       <h3 className="mt-4 font-display text-base font-semibold">{f.title}</h3>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
       <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
