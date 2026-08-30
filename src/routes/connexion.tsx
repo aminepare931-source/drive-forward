@@ -1,13 +1,19 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { AlertTriangle, ArrowRight } from "lucide-react";
+import { AlertTriangle, ArrowRight, Building2, GraduationCap, UserCog } from "lucide-react";
 import { toast } from "sonner";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthSubmit, type SubmitStatus } from "@/components/auth/AuthSubmit";
 import { useSession } from "@/lib/session";
 import { fadeUp, stagger } from "@/lib/motion";
+
+const DEMO_ACCOUNTS = [
+  { email: "demo.directeur@drivehub.test", label: "Directeur", icon: Building2 },
+  { email: "demo.moniteur@drivehub.test", label: "Moniteur", icon: UserCog },
+  { email: "demo.eleve@drivehub.test", label: "Élève", icon: GraduationCap },
+] as const;
 
 export const Route = createFileRoute("/connexion")({
   head: () => ({
@@ -49,6 +55,16 @@ function LoginPage() {
   const go = (role: string) =>
     navigate({ to: role === "student" ? "/mon-espace" : "/dashboard", replace: true });
 
+  const quickLogin = (demoEmail: string) => {
+    const next = login(demoEmail);
+    if (!next) {
+      toast.error("Compte démo introuvable.");
+      return;
+    }
+    toast.success(`Connecté en tant que ${next.user.firstName} 🚗`);
+    go(next.user.role);
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (status !== "idle") return;
@@ -88,6 +104,30 @@ function LoginPage() {
         </motion.div>
 
         <motion.div variants={fadeUp} className="mt-7">
+          <p className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Connexion rapide (démo)
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {DEMO_ACCOUNTS.map((acc) => (
+              <button
+                key={acc.email}
+                type="button"
+                onClick={() => quickLogin(acc.email)}
+                className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background px-2 py-3 text-center transition-colors hover:border-primary/40 hover:bg-primary/5"
+              >
+                <acc.icon className="size-4 text-primary" />
+                <span className="text-xs font-medium">{acc.label}</span>
+              </button>
+            ))}
+          </div>
+          <div className="mt-6 flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />
+            ou avec un compte
+            <span className="h-px flex-1 bg-border" />
+          </div>
+        </motion.div>
+
+        <motion.div variants={fadeUp} className="mt-5">
           <form onSubmit={onSubmit} className="space-y-4">
             <AuthField
               label="Adresse e-mail"
