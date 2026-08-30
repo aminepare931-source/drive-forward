@@ -6,6 +6,9 @@ import { toast } from "sonner";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { AuthSubmit, type SubmitStatus } from "@/components/auth/AuthSubmit";
+import { Combobox } from "@/components/ui/combobox";
+import { Label } from "@/components/ui/label";
+import { CITIES } from "@/lib/cities";
 import { useSession } from "@/lib/session";
 import { authService, type RegisterKind } from "@/services/auth";
 import { fadeUp, stagger } from "@/lib/motion";
@@ -64,6 +67,10 @@ function RegisterPage() {
     if (status !== "idle") return;
     setError(null);
 
+    if (kind === "director" && !city.trim()) {
+      setError("Veuillez sélectionner la ville de votre établissement.");
+      return;
+    }
     if (!accept) {
       setError("Veuillez accepter les conditions générales pour créer votre compte.");
       return;
@@ -220,13 +227,17 @@ function RegisterPage() {
                   onChange={(e) => setSchoolName(e.target.value)}
                   required
                 />
-                <AuthField
-                  label="Ville"
-                  placeholder="Ex. Lyon"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  required
-                />
+                <div className="space-y-1.5">
+                  <Label htmlFor="city">Ville</Label>
+                  <Combobox
+                    id="city"
+                    options={CITIES}
+                    value={city}
+                    onChange={setCity}
+                    placeholder="Sélectionner une ville"
+                    searchPlaceholder="Rechercher une ville…"
+                  />
+                </div>
               </>
             )}
 

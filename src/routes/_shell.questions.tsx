@@ -59,6 +59,9 @@ function QuestionsPage() {
   const [category, setCategory] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
   const [open, setOpen] = useState(false);
+  const [formCategory, setFormCategory] = useState<string>(QUESTION_CATEGORIES[0] ?? "");
+  const [formDifficulty, setFormDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [correctIndex, setCorrectIndex] = useState("0");
 
   const { data, isLoading } = useQuery({
     queryKey: ["questions", orgId, search, category, difficulty],
@@ -77,6 +80,9 @@ function QuestionsPage() {
     onSuccess: () => {
       toast.success("Question ajoutée");
       setOpen(false);
+      setFormCategory(QUESTION_CATEGORIES[0] ?? "");
+      setFormDifficulty("medium");
+      setCorrectIndex("0");
       qc.invalidateQueries({ queryKey: ["questions", orgId] });
     },
   });
@@ -105,10 +111,10 @@ function QuestionsPage() {
                   const fd = new FormData(e.currentTarget);
                   create.mutate({
                     text: String(fd.get("text")),
-                    category: String(fd.get("category")),
-                    difficulty: String(fd.get("difficulty")) as "easy" | "medium" | "hard",
+                    category: formCategory,
+                    difficulty: formDifficulty,
                     choices: [String(fd.get("c0")), String(fd.get("c1")), String(fd.get("c2"))],
-                    correctIndex: Number(fd.get("correct")),
+                    correctIndex: Number(correctIndex),
                     explanation: String(fd.get("explanation")),
                   });
                 }}
@@ -120,29 +126,34 @@ function QuestionsPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="q-cat">Catégorie</Label>
-                    <select
-                      id="q-cat"
-                      name="category"
-                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-                    >
-                      {QUESTION_CATEGORIES.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
+                    <Select value={formCategory} onValueChange={setFormCategory}>
+                      <SelectTrigger id="q-cat">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {QUESTION_CATEGORIES.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="q-diff">Difficulté</Label>
-                    <select
-                      id="q-diff"
-                      name="difficulty"
-                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    <Select
+                      value={formDifficulty}
+                      onValueChange={(v) => setFormDifficulty(v as typeof formDifficulty)}
                     >
-                      <option value="easy">Facile</option>
-                      <option value="medium">Moyen</option>
-                      <option value="hard">Difficile</option>
-                    </select>
+                      <SelectTrigger id="q-diff">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="easy">Facile</SelectItem>
+                        <SelectItem value="medium">Moyen</SelectItem>
+                        <SelectItem value="hard">Difficile</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -159,15 +170,16 @@ function QuestionsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="correct">Bonne réponse</Label>
-                  <select
-                    id="correct"
-                    name="correct"
-                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="0">Réponse 1</option>
-                    <option value="1">Réponse 2</option>
-                    <option value="2">Réponse 3</option>
-                  </select>
+                  <Select value={correctIndex} onValueChange={setCorrectIndex}>
+                    <SelectTrigger id="correct">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Réponse 1</SelectItem>
+                      <SelectItem value="1">Réponse 2</SelectItem>
+                      <SelectItem value="2">Réponse 3</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="explanation">Explication</Label>

@@ -24,7 +24,10 @@ export const instructorsService = {
   },
   async create(
     organizationId: string,
-    input: Pick<Instructor, "firstName" | "lastName" | "email" | "phone" | "specialties">,
+    input: Pick<
+      Instructor,
+      "firstName" | "lastName" | "email" | "phone" | "specialties" | "availability"
+    >,
   ) {
     const instructor: Instructor = {
       ...input,
@@ -34,7 +37,6 @@ export const instructorsService = {
       studentCount: 0,
       sessionsThisWeek: 0,
       rating: 0,
-      availability: "available",
       hiredAt: new Date().toISOString(),
     };
     store().instructors.unshift(instructor);

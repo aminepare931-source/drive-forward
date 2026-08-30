@@ -10,6 +10,7 @@ import { StatusBadge } from "@/components/common/StatusBadge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { CITIES } from "@/lib/cities";
 import { studentsService } from "@/services/students";
 import { useOrg } from "@/lib/org";
 import { initials } from "@/lib/format";
@@ -70,6 +72,8 @@ function StudentsPage() {
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState(false);
+  const [category, setCategory] = useState<LicenseCategory>("B");
+  const [city, setCity] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["students", orgId, search, status, page],
@@ -83,17 +87,19 @@ function StudentsPage() {
       email: string;
       phone: string;
       category: LicenseCategory;
+      birthDate: string;
+      address: string;
     }) =>
       studentsService.create(orgId, {
         ...input,
-        birthDate: "2004-01-01",
-        address: "À compléter",
         enrolledAt: new Date().toISOString(),
         status: "active",
       }),
     onSuccess: () => {
       toast.success("Élève inscrit");
       setOpen(false);
+      setCategory("B");
+      setCity("");
       qc.invalidateQueries({ queryKey: ["students", orgId] });
     },
   });
@@ -125,45 +131,66 @@ function StudentsPage() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   const fd = new FormData(e.currentTarget);
+                  if (!city.trim()) {
+                    toast.error("Renseignez la ville de l'élève.");
+                    return;
+                  }
                   create.mutate({
                     firstName: String(fd.get("firstName")),
                     lastName: String(fd.get("lastName")),
                     email: String(fd.get("email")),
                     phone: String(fd.get("phone")),
-                    category: String(fd.get("category")) as LicenseCategory,
+                    birthDate: String(fd.get("birthDate")),
+                    category,
+                    address: city,
                   });
                 }}
               >
                 <div className="space-y-2">
                   <Label htmlFor="firstName">Prénom</Label>
-                  <Input id="firstName" name="firstName" required />
+                  <Input id="firstName" name="firstName" autoComplete="given-name" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Nom</Label>
-                  <Input id="lastName" name="lastName" required />
+                  <Input id="lastName" name="lastName" autoComplete="family-name" required />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="email">E-mail</Label>
-                  <Input id="email" name="email" type="email" required />
+                  <Input id="email" name="email" type="email" autoComplete="email" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">Téléphone</Label>
-                  <Input id="phone" name="phone" required />
+                  <Input id="phone" name="phone" type="tel" autoComplete="tel" required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="birthDate">Date de naissance</Label>
+                  <Input id="birthDate" name="birthDate" type="date" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="category">Catégorie</Label>
-                  <select
-                    id="category"
-                    name="category"
-                    defaultValue="B"
-                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={category} onValueChange={(v) => setCategory(v as LicenseCategory)}>
+                    <SelectTrigger id="category">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ville</Label>
+                  <Combobox
+                    id="city"
+                    options={CITIES}
+                    value={city}
+                    onChange={setCity}
+                    placeholder="Sélectionner une ville"
+                    searchPlaceholder="Rechercher une ville…"
+                  />
                 </div>
               </form>
               <DialogFooter>

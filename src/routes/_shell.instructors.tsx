@@ -21,9 +21,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { instructorsService } from "@/services/instructors";
 import { useOrg } from "@/lib/org";
 import { date, initials } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import type { LicenseCategory } from "@/types";
 
 export const Route = createFileRoute("/_shell/instructors")({
@@ -45,11 +53,15 @@ export const Route = createFileRoute("/_shell/instructors")({
   component: InstructorsPage,
 });
 
+const ALL_CATEGORIES: LicenseCategory[] = ["A", "A1", "B", "BE", "C", "D"];
+
 function InstructorsPage() {
   const { orgId } = useOrg();
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
+  const [specialties, setSpecialties] = useState<LicenseCategory[]>(["B"]);
+  const [availability, setAvailability] = useState<"available" | "busy" | "off">("available");
 
   const { data, isLoading } = useQuery({
     queryKey: ["instructors", orgId, search],
@@ -63,10 +75,13 @@ function InstructorsPage() {
       email: string;
       phone: string;
       specialties: LicenseCategory[];
+      availability: "available" | "busy" | "off";
     }) => instructorsService.create(orgId, input),
     onSuccess: () => {
       toast.success("Moniteur ajouté");
       setOpen(false);
+      setSpecialties(["B"]);
+      setAvailability("available");
       qc.invalidateQueries({ queryKey: ["instructors", orgId] });
     },
   });
@@ -93,30 +108,81 @@ function InstructorsPage() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   const fd = new FormData(e.currentTarget);
+                  if (specialties.length === 0) {
+                    toast.error("Sélectionnez au moins une spécialité.");
+                    return;
+                  }
                   create.mutate({
                     firstName: String(fd.get("firstName")),
                     lastName: String(fd.get("lastName")),
                     email: String(fd.get("email")),
                     phone: String(fd.get("phone")),
-                    specialties: ["B"],
+                    specialties,
+                    availability,
                   });
                 }}
               >
                 <div className="space-y-2">
                   <Label htmlFor="i-first">Prénom</Label>
-                  <Input id="i-first" name="firstName" required />
+                  <Input id="i-first" name="firstName" autoComplete="given-name" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="i-last">Nom</Label>
-                  <Input id="i-last" name="lastName" required />
+                  <Input id="i-last" name="lastName" autoComplete="family-name" required />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="i-mail">E-mail</Label>
-                  <Input id="i-mail" name="email" type="email" required />
+                  <Input id="i-mail" name="email" type="email" autoComplete="email" required />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
                   <Label htmlFor="i-phone">Téléphone</Label>
-                  <Input id="i-phone" name="phone" required />
+                  <Input id="i-phone" name="phone" type="tel" autoComplete="tel" required />
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Spécialités (catégories enseignées)</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {ALL_CATEGORIES.map((c) => {
+                      const active = specialties.includes(c);
+                      return (
+                        <button
+                          key={c}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() =>
+                            setSpecialties((prev) =>
+                              active ? prev.filter((v) => v !== c) : [...prev, c],
+                            )
+                          }
+                          className={cn(
+                            "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                            active
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-input bg-background text-muted-foreground hover:border-primary/40",
+                          )}
+                        >
+                          {c}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="i-avail">Disponibilité</Label>
+                  <Select
+                    value={availability}
+                    onValueChange={(v) => setAvailability(v as typeof availability)}
+                  >
+                    <SelectTrigger id="i-avail">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="available">Disponible</SelectItem>
+                      <SelectItem value="busy">Occupé</SelectItem>
+                      <SelectItem value="off">Absent</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </form>
               <DialogFooter>
