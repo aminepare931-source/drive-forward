@@ -428,7 +428,7 @@ const FEATURES: Feature[] = [
     title: "Pilotage",
     desc: "Tableau de bord et suivi d'activité pour diriger votre établissement.",
     roles: "Direction",
-    photo: "https://images.pexels.com/photos/30688593/pexels-photo-30688593.jpeg?auto=compress&cs=tinysrgb&w=800",
+    photo: "/images/features/pilotage.jpg",
   },
   {
     icon: Users,
