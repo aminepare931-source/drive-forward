@@ -12,8 +12,10 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+type ComboboxOption = string | { value: string; label: string };
+
 interface ComboboxProps {
-  options: string[];
+  options: ComboboxOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -24,7 +26,14 @@ interface ComboboxProps {
   allowCustom?: boolean;
 }
 
-/** Champ de saisie avec autocomplétion (ex. ville). Accepte une valeur hors liste si `allowCustom`. */
+function optionValue(o: ComboboxOption) {
+  return typeof o === "string" ? o : o.value;
+}
+function optionLabel(o: ComboboxOption) {
+  return typeof o === "string" ? o : o.label;
+}
+
+/** Champ de saisie avec autocomplétion (ex. ville, ou sélection dans une longue liste). */
 export function Combobox({
   options,
   value,
@@ -38,6 +47,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const selectedLabel = options.find((o) => optionValue(o) === value);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -52,7 +62,7 @@ export function Combobox({
           className="h-9 w-full justify-between font-normal"
         >
           <span className={cn("truncate", !value && "text-muted-foreground")}>
-            {value || placeholder}
+            {selectedLabel ? optionLabel(selectedLabel) : value || placeholder}
           </span>
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
@@ -83,26 +93,27 @@ export function Combobox({
             </CommandEmpty>
             <CommandGroup>
               {(allowCustom
-                ? options.filter((o) => o.toLowerCase().includes(query.toLowerCase()))
+                ? options.filter((o) =>
+                    optionLabel(o).toLowerCase().includes(query.toLowerCase()),
+                  )
                 : options
-              ).map((option) => (
-                <CommandItem
-                  key={option}
-                  value={option}
-                  onSelect={(current) => {
-                    onChange(current === value ? "" : option);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 size-4",
-                      value === option ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  {option}
-                </CommandItem>
-              ))}
+              ).map((option) => {
+                const v = optionValue(option);
+                const l = optionLabel(option);
+                return (
+                  <CommandItem
+                    key={v}
+                    value={l}
+                    onSelect={() => {
+                      onChange(v === value ? "" : v);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check className={cn("mr-2 size-4", value === v ? "opacity-100" : "opacity-0")} />
+                    {l}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>

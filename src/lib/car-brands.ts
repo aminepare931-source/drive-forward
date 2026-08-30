@@ -1,0 +1,21 @@
+/** Marques de véhicules proposées dans le champ avec autocomplétion (liste indicative). */
+export const CAR_BRANDS = [
+  "Toyota",
+  "Peugeot",
+  "Renault",
+  "Citroën",
+  "Volkswagen",
+  "Hyundai",
+  "Kia",
+  "Nissan",
+  "Ford",
+  "Dacia",
+  "Opel",
+  "Mercedes-Benz",
+  "BMW",
+  "Suzuki",
+  "Honda",
+  "Mitsubishi",
+  "Fiat",
+  "Skoda",
+];

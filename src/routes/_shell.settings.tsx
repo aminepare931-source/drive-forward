@@ -5,12 +5,14 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Combobox } from "@/components/ui/combobox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CITIES } from "@/lib/cities";
 import { organizationsService } from "@/services/misc";
 import { useOrg } from "@/lib/org";
 import { ROLE_LABELS } from "@/lib/session";
@@ -74,7 +76,14 @@ function SettingsPage() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="org-city">Ville</Label>
-                <Input id="org-city" value={orgCity} onChange={(e) => setCity(e.target.value)} />
+                <Combobox
+                  id="org-city"
+                  options={CITIES}
+                  value={orgCity}
+                  onChange={setCity}
+                  placeholder="Sélectionner une ville"
+                  searchPlaceholder="Rechercher une ville…"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="org-slug">Identifiant</Label>

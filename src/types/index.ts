@@ -224,7 +224,7 @@ export interface Payment {
   studentId: string;
   total: number;
   paid: number;
-  method: "card" | "cash" | "transfer";
+  method: "card" | "cash" | "transfer" | "mobile_money";
   status: "paid" | "partial" | "late";
   date: string;
   history: { date: string; amount: number; method: string }[];

@@ -10,6 +10,7 @@ import { StatCard } from "@/components/common/StatCard";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,7 @@ import {
 import { vehiclesService } from "@/services/misc";
 import { useOrg } from "@/lib/org";
 import { date, money } from "@/lib/format";
+import { CAR_BRANDS } from "@/lib/car-brands";
 import type { LicenseCategory } from "@/types";
 
 export const Route = createFileRoute("/_shell/vehicles")({
@@ -114,10 +116,13 @@ function VehiclesPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
                   <Label htmlFor="brand">Marque</Label>
-                  <Input
+                  <Combobox
                     id="brand"
+                    options={CAR_BRANDS}
                     value={form.brand}
-                    onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                    onChange={(v) => setForm({ ...form, brand: v })}
+                    placeholder="Sélectionner une marque"
+                    searchPlaceholder="Rechercher une marque…"
                   />
                 </div>
                 <div className="grid gap-2">

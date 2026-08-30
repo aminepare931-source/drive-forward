@@ -10,6 +10,7 @@ import { StatCard } from "@/components/common/StatCard";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Combobox } from "@/components/ui/combobox";
 import {
   Dialog,
   DialogContent,
@@ -185,22 +186,20 @@ function DrivingPage() {
                 </DialogHeader>
                 <div className="grid gap-4">
                   <div className="grid gap-2">
-                    <Label>Élève</Label>
-                    <Select
+                    <Label htmlFor="driving-student">Élève</Label>
+                    <Combobox
+                      id="driving-student"
+                      allowCustom={false}
+                      options={(students?.items ?? []).map((s) => ({
+                        value: s.id,
+                        label: `${s.firstName} ${s.lastName}`,
+                      }))}
                       value={form.studentId}
-                      onValueChange={(v) => setForm({ ...form, studentId: v })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {students?.items.slice(0, 60).map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.firstName} {s.lastName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={(v) => setForm({ ...form, studentId: v })}
+                      placeholder="Rechercher un élève…"
+                      searchPlaceholder="Rechercher par nom…"
+                      emptyLabel="Aucun élève trouvé."
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label>Moniteur</Label>

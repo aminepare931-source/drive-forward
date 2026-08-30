@@ -75,6 +75,7 @@ function PaymentsPage() {
   const [status, setStatus] = useState("all");
   const [target, setTarget] = useState<string | null>(null);
   const [amount, setAmount] = useState("100");
+  const [method, setMethod] = useState<"card" | "cash" | "transfer" | "mobile_money">("cash");
 
   const rows = useMemo(
     () => (data ?? []).filter((p) => status === "all" || p.status === status),
@@ -90,7 +91,7 @@ function PaymentsPage() {
   }, [data]);
 
   const pay = useMutation({
-    mutationFn: () => paymentsService.pay(orgId, target!, Number(amount) || 0),
+    mutationFn: () => paymentsService.pay(orgId, target!, Number(amount) || 0, method),
     onSuccess: () => {
       toast.success("Paiement enregistré");
       setTarget(null);
@@ -205,14 +206,30 @@ function PaymentsPage() {
           <DialogHeader>
             <DialogTitle>Enregistrer un paiement</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-2">
-            <Label htmlFor="amount">Montant</Label>
-            <Input
-              id="amount"
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="amount">Montant</Label>
+              <Input
+                id="amount"
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="method">Mode de paiement</Label>
+              <Select value={method} onValueChange={(v) => setMethod(v as typeof method)}>
+                <SelectTrigger id="method">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash">Espèces</SelectItem>
+                  <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                  <SelectItem value="transfer">Virement</SelectItem>
+                  <SelectItem value="card">Carte bancaire</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setTarget(null)}>

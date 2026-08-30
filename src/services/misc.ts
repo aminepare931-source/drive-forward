@@ -76,11 +76,16 @@ export const paymentsService = {
     if (filters.studentId) rows = rows.filter((p) => p.studentId === filters.studentId);
     return delay(rows);
   },
-  async pay(organizationId: string, paymentId: string, amount: number) {
+  async pay(
+    organizationId: string,
+    paymentId: string,
+    amount: number,
+    method: "card" | "cash" | "transfer" | "mobile_money" = "card",
+  ) {
     const payment = scoped(store().payments, organizationId).find((p) => p.id === paymentId);
     if (!payment) throw new Error("Paiement introuvable");
     payment.paid = Math.min(payment.total, payment.paid + amount);
-    payment.history.push({ date: new Date().toISOString(), amount, method: "card" });
+    payment.history.push({ date: new Date().toISOString(), amount, method });
     return delay(payment);
   },
 };
