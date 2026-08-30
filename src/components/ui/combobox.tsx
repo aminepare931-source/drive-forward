@@ -59,7 +59,7 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="h-10 w-full justify-between rounded-lg font-normal"
+          className="h-10 w-full justify-between rounded-lg border-border/70 bg-muted/40 font-normal transition-colors hover:bg-muted/40 focus:border-primary/50 focus:bg-background focus:ring-2 focus:ring-primary/20"
         >
           <span className={cn("truncate", !value && "text-muted-foreground")}>
             {selectedLabel ? optionLabel(selectedLabel) : value || placeholder}
