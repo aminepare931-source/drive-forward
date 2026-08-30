@@ -456,7 +456,7 @@ const FEATURES: Feature[] = [
     title: "Devoirs",
     desc: "Exercices, banque de questions et remises corrigées.",
     roles: "Direction, moniteurs & élèves",
-    photo: "https://images.pexels.com/photos/3869652/pexels-photo-3869652.jpeg?auto=compress&cs=tinysrgb&w=800",
+    photo: "/images/features/devoirs.jpg",
   },
   {
     icon: GraduationCap,
@@ -470,7 +470,7 @@ const FEATURES: Feature[] = [
     title: "Planning",
     desc: "Séances, créneaux et réservation des véhicules en un coup d'œil.",
     roles: "Tous les rôles",
-    photo: "https://images.pexels.com/photos/3869641/pexels-photo-3869641.jpeg?auto=compress&cs=tinysrgb&w=800",
+    photo: "/images/features/planning.jpg",
   },
   {
     icon: Car,
