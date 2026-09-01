@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { GraduationCap, MapPin, Plus, Search, User, Users } from "lucide-react";
+import { GraduationCap, FileText, MapPin, Plus, Search, User, Users } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/common/PageHeader";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -40,9 +40,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CITIES } from "@/lib/cities";
+import { DOCUMENT_CATEGORIES, type DocumentCategory } from "@/lib/document-categories";
 import { studentsService } from "@/services/students";
 import { instructorsService } from "@/services/instructors";
 import { groupsService } from "@/services/groups";
+import { documentsService } from "@/services/misc";
 import { useOrg } from "@/lib/org";
 import { initials } from "@/lib/format";
 import type { LicenseCategory } from "@/types";
@@ -80,6 +82,7 @@ function StudentsPage() {
   const [instructorId, setInstructorId] = useState("");
   const [groupId, setGroupId] = useState("");
   const [enrolledAt, setEnrolledAt] = useState(() => new Date().toISOString().slice(0, 10));
+  const [files, setFiles] = useState<{ file: File; category: DocumentCategory }[]>([]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["students", orgId, search, status, page],
@@ -102,6 +105,7 @@ function StudentsPage() {
     setInstructorId("");
     setGroupId("");
     setEnrolledAt(new Date().toISOString().slice(0, 10));
+    setFiles([]);
   };
 
   const create = useMutation({
@@ -121,7 +125,18 @@ function StudentsPage() {
         ...input,
         status: "active",
       }),
-    onSuccess: () => {
+    onSuccess: (student) => {
+      if (files.length > 0) {
+        void Promise.all(
+          files.map((f) =>
+            documentsService.upload(orgId, {
+              name: f.file.name,
+              category: f.category,
+              studentId: student.id,
+            }),
+          ),
+        ).then(() => qc.invalidateQueries({ queryKey: ["documents", orgId] }));
+      }
       toast.success("Élève inscrit");
       setOpen(false);
       resetForm();
@@ -290,6 +305,77 @@ function StudentsPage() {
                         emptyLabel="Aucun groupe trouvé."
                       />
                     </div>
+                  </div>
+                </section>
+
+                <Separator className="my-6" />
+
+                <section>
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <FileText className="size-4 text-primary" /> Documents
+                    <span className="font-normal text-muted-foreground">(facultatif)</span>
+                  </h3>
+                  <div className="mt-4 space-y-3">
+                    <Input
+                      type="file"
+                      multiple
+                      accept="application/pdf,image/*"
+                      onChange={(e) => {
+                        const picked = Array.from(e.target.files ?? []);
+                        if (picked.length === 0) return;
+                        setFiles((prev) => [
+                          ...prev,
+                          ...picked.map((file) => ({ file, category: "identity" as DocumentCategory })),
+                        ]);
+                        e.target.value = "";
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Pièce d'identité, certificat médical, contrat… Peut aussi être ajouté plus
+                      tard depuis la fiche de l'élève.
+                    </p>
+                    {files.length > 0 ? (
+                      <ul className="space-y-2">
+                        {files.map((f, i) => (
+                          <li
+                            key={`${f.file.name}-${i}`}
+                            className="flex items-center gap-2 rounded-lg border border-border/70 bg-muted/40 p-2.5"
+                          >
+                            <FileText className="size-4 shrink-0 text-muted-foreground" />
+                            <span className="min-w-0 flex-1 truncate text-sm">{f.file.name}</span>
+                            <Select
+                              value={f.category}
+                              onValueChange={(v) =>
+                                setFiles((prev) =>
+                                  prev.map((item, idx) =>
+                                    idx === i ? { ...item, category: v as DocumentCategory } : item,
+                                  ),
+                                )
+                              }
+                            >
+                              <SelectTrigger className="h-8 w-40 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {DOCUMENT_CATEGORIES.map((c) => (
+                                  <SelectItem key={c.value} value={c.value}>
+                                    {c.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setFiles((prev) => prev.filter((_, idx) => idx !== i))}
+                            >
+                              Retirer
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                   </div>
                 </section>
               </form>

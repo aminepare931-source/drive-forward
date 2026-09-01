@@ -37,6 +37,7 @@ import {
 import { documentsService } from "@/services/misc";
 import { useOrg } from "@/lib/org";
 import { date } from "@/lib/format";
+import { DOCUMENT_CATEGORIES, type DocumentCategory } from "@/lib/document-categories";
 
 export const Route = createFileRoute("/_shell/documents")({
   head: () => ({
@@ -57,15 +58,9 @@ export const Route = createFileRoute("/_shell/documents")({
   component: DocumentsPage,
 });
 
-const CATEGORIES = [
-  { value: "contract", label: "Contrat" },
-  { value: "identity", label: "Identité" },
-  { value: "medical", label: "Médical" },
-  { value: "certificate", label: "Attestation" },
-  { value: "invoice", label: "Facture" },
-] as const;
+const CATEGORIES = DOCUMENT_CATEGORIES;
 
-type Category = (typeof CATEGORIES)[number]["value"];
+type Category = DocumentCategory;
 
 function DocumentsPage() {
   const { orgId, role, studentId } = useOrg();
